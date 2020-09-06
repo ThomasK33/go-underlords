@@ -16,7 +16,7 @@ func main() {
 	log.Println("Starting " + Version + " (" + Build + ")")
 
 	code := lib.ShareCodeV8{}
-	code.DebugPrintSizes()
+	// code.DebugPrintSizes()
 
 	code.BoardUnitIDs[0][0] = 46 // Alchemist
 	code.BoardUnitIDs[6][6] = 11 // Antimage
@@ -34,8 +34,8 @@ func main() {
 		ItemID: 10170,
 	})
 
-	code.PackedUnitRanks[0] = lib.PackedUnitRanks([]uint8{2})
-	code.PackedUnitRanks[6] = lib.PackedUnitRanks([]uint8{0, 0, 0, 0, 0, 0, 3, 0})
+	code.PackedUnitRanks[0] = lib.PackUnitRanks([]uint8{2})
+	code.PackedUnitRanks[6] = lib.PackUnitRanks([]uint8{0, 0, 0, 0, 0, 0, 3, 0})
 
 	successfullShareCode := code.ToBase64String()
 	log.Println(successfullShareCode)

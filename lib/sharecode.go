@@ -19,33 +19,6 @@ const (
 	SharecodeMaxUnequippedItems = 10
 )
 
-// EquippedItem - Equipped item struct
-type EquippedItem struct {
-	ItemID uint16
-}
-
-// EquippedItem3Bytes - Equipped items use up 24 bits, yet one bit is unused
-type EquippedItem3Bytes [3]byte
-
-// ToEquippedItem - Convert back 3 bytes array to EquippedItem struct
-func (item *EquippedItem3Bytes) ToEquippedItem() EquippedItem {
-	var now []byte = item[:2]
-	nowBuffer := bytes.NewReader(now)
-	var itemDefIndex uint16
-	binary.Read(nowBuffer, binary.LittleEndian, &itemDefIndex)
-
-	return EquippedItem{
-		ItemID: itemDefIndex,
-	}
-}
-
-// NewEquippedItem3Bytes - Go hack to create a 3 bytes big struct from a ShareCodeEquippedItem
-func NewEquippedItem3Bytes(item EquippedItem) EquippedItem3Bytes {
-	i := item.ItemID
-	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
-	return EquippedItem3Bytes{l, h, 00}
-}
-
 // ShareCodeV8 - The actual share code structure
 type ShareCodeV8 struct {
 	// total sizeof: 424
@@ -55,10 +28,10 @@ type ShareCodeV8 struct {
 	UnitItems            [BoardCellNum][BoardCellNum]EquippedItem3Bytes     // 24 bits per unit item    (192 bytes)
 	BoardUnitIDs         [BoardCellNum][BoardCellNum]uint8                  // 8 bits per unit          (64 bytes)
 	SelectedTalents      [SharecodeMaxTalents][2]uint8                      // 128 bits per player      (32 bytes)
-	PackedUnitRanks      [BoardCellNum]uint32                               // 4 bits per unit rank     (32 bytes)
+	PackedUnitRanks      [BoardCellNum]PackedUnitRank                       // 4 bits per unit rank     (32 bytes)
 	BenchUnitItems       [BoardCellNum]EquippedItem3Bytes                   // 24 bits per unit item    (24 bytes)
 	BenchedUnitIDs       [BoardCellNum]uint8                                // 8 bits per unit          (8 bytes)
-	PackedBenchUnitRanks uint32                                             // 4 bits per unit rank     (4 bytes)
+	PackedBenchUnitRanks PackedUnitRank                                     // 4 bits per unit rank     (4 bytes)
 	UnderlordIDs         [2]uint8                                           // 8 bits per player        (2 bytes)
 	UnderlordRanks       [2]uint8                                           // 8 bits per player        (2 bytes)
 	UnequippedItems      [SharecodeMaxUnequippedItems][2]EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
@@ -141,9 +114,30 @@ func ShareCodeFromBase64(sBase64 string) ShareCodeV8 {
 	return newShareCode
 }
 
-// PackedUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
-func PackedUnitRanks(ranks []uint8) uint32 {
-	var packedUnitRank uint32 = 0
+// PackedUnitRank - Alias for uint32
+type PackedUnitRank uint32
+
+// UnpackUnitRanks - Unpack packed unit ranks
+func (packedRanks *PackedUnitRank) UnpackUnitRanks() []uint8 {
+	var ranks []uint8 = make([]uint8, BoardCellNum)
+
+	for i := range ranks {
+		for offsetIndex, offset := range []int{0, 1, 2, 4} {
+			var a uint32 = (1 << ((i * 4) + offsetIndex))
+			bit := uint32(*packedRanks) & (1 << ((i * 4) + offsetIndex))
+
+			if bit == a {
+				ranks[i] |= (1 << offset)
+			}
+		}
+	}
+
+	return ranks
+}
+
+// PackUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
+func PackUnitRanks(ranks []uint8) PackedUnitRank {
+	var packedUnitRank PackedUnitRank = 0
 
 	for i, rank := range ranks {
 		for offsetIndex, offset := range []uint8{1, 2, 4, 8} {
@@ -158,20 +152,29 @@ func PackedUnitRanks(ranks []uint8) uint32 {
 	return packedUnitRank
 }
 
-// UnpackUnitRanks - Unpack packed unit ranks
-func UnpackUnitRanks(packedRanks uint32) []uint8 {
-	var ranks []uint8 = make([]uint8, BoardCellNum)
+// EquippedItem - Equipped item struct
+type EquippedItem struct {
+	ItemID uint16
+}
 
-	for i := range ranks {
-		for offsetIndex, offset := range []int{0, 1, 2, 4} {
-			var a uint32 = (1 << ((i * 4) + offsetIndex))
-			bit := packedRanks & (1 << ((i * 4) + offsetIndex))
+// EquippedItem3Bytes - Equipped items use up 24 bits, yet one bit is unused
+type EquippedItem3Bytes [3]byte
 
-			if bit == a {
-				ranks[i] |= (1 << offset)
-			}
-		}
+// ToEquippedItem - Convert back 3 bytes array to EquippedItem struct
+func (item *EquippedItem3Bytes) ToEquippedItem() EquippedItem {
+	var now []byte = item[:2]
+	nowBuffer := bytes.NewReader(now)
+	var itemDefIndex uint16
+	binary.Read(nowBuffer, binary.LittleEndian, &itemDefIndex)
+
+	return EquippedItem{
+		ItemID: itemDefIndex,
 	}
+}
 
-	return ranks
+// NewEquippedItem3Bytes - Go hack to create a 3 bytes big struct from a ShareCodeEquippedItem
+func NewEquippedItem3Bytes(item EquippedItem) EquippedItem3Bytes {
+	i := item.ItemID
+	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
+	return EquippedItem3Bytes{l, h, 00}
 }
