@@ -13,10 +13,10 @@ import (
 
 // Share Code Constants
 const (
-	DacShareCodeVersion             = 8
-	DacBoardCellNum                 = 8
-	CdacSharecodeMaxTalents         = 16
-	CDacSharecodeMaxUnequippedItems = 10
+	ShareCodeVersion            = 8
+	BoardCellNum                = 8
+	SharecodeMaxTalents         = 16
+	SharecodeMaxUnequippedItems = 10
 )
 
 // EquippedItem - Equipped item struct
@@ -52,16 +52,16 @@ type ShareCodeV8 struct {
 
 	// Intentionally not public, as this field shall be a constant 0, padding 4 bytes
 	version              uint8
-	UnitItems            [DacBoardCellNum][DacBoardCellNum]EquippedItem3Bytes   // 24 bits per unit item    (192 bytes)
-	BoardUnitIDs         [DacBoardCellNum][DacBoardCellNum]uint8                // 8 bits per unit          (64 bytes)
-	SelectedTalents      [CdacSharecodeMaxTalents][2]uint8                      // 128 bits per player      (32 bytes)
-	PackedUnitRanks      [DacBoardCellNum]uint32                                // 4 bits per unit rank     (32 bytes)
-	BenchUnitItems       [DacBoardCellNum]EquippedItem3Bytes                    // 24 bits per unit item    (24 bytes)
-	BenchedUnitIDs       [DacBoardCellNum]uint8                                 // 8 bits per unit          (8 bytes)
-	PackedBenchUnitRanks uint32                                                 // 4 bits per unit rank     (4 bytes)
-	UnderlordIDs         [2]uint8                                               // 8 bits per player        (2 bytes)
-	UnderlordRanks       [2]uint8                                               // 8 bits per player        (2 bytes)
-	UnequippedItems      [CDacSharecodeMaxUnequippedItems][2]EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
+	UnitItems            [BoardCellNum][BoardCellNum]EquippedItem3Bytes     // 24 bits per unit item    (192 bytes)
+	BoardUnitIDs         [BoardCellNum][BoardCellNum]uint8                  // 8 bits per unit          (64 bytes)
+	SelectedTalents      [SharecodeMaxTalents][2]uint8                      // 128 bits per player      (32 bytes)
+	PackedUnitRanks      [BoardCellNum]uint32                               // 4 bits per unit rank     (32 bytes)
+	BenchUnitItems       [BoardCellNum]EquippedItem3Bytes                   // 24 bits per unit item    (24 bytes)
+	BenchedUnitIDs       [BoardCellNum]uint8                                // 8 bits per unit          (8 bytes)
+	PackedBenchUnitRanks uint32                                             // 4 bits per unit rank     (4 bytes)
+	UnderlordIDs         [2]uint8                                           // 8 bits per player        (2 bytes)
+	UnderlordRanks       [2]uint8                                           // 8 bits per player        (2 bytes)
+	UnequippedItems      [SharecodeMaxUnequippedItems][2]EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
 }
 
 // ToBase64String - Returns base64 encoding of the share code
@@ -72,7 +72,7 @@ func (sc *ShareCodeV8) ToBase64String() string {
 	compressed := snappy.Encode(nil, asByteSlice)
 	encodedBoardCode := base64.StdEncoding.EncodeToString(compressed)
 
-	successfullShareCode := strconv.FormatInt(DacShareCodeVersion, 16) + encodedBoardCode
+	successfullShareCode := strconv.FormatInt(ShareCodeVersion, 16) + encodedBoardCode
 
 	// Assert correctness by creating new one from string
 	return successfullShareCode
@@ -160,7 +160,7 @@ func PackedUnitRanks(ranks []uint8) uint32 {
 
 // UnpackUnitRanks - Unpack packed unit ranks
 func UnpackUnitRanks(packedRanks uint32) []uint8 {
-	var ranks []uint8 = make([]uint8, DacBoardCellNum)
+	var ranks []uint8 = make([]uint8, BoardCellNum)
 
 	for i := range ranks {
 		for offsetIndex, offset := range []int{0, 1, 2, 4} {
