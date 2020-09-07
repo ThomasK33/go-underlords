@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/ThomasK33/go-sharecodes/lib"
+	"github.com/ThomasK33/go-underlords/lib"
 )
 
 // Runtime version and build number
@@ -40,7 +40,8 @@ func main() {
 	successfullShareCode := code.ToBase64String()
 	log.Println(successfullShareCode)
 
-	testBoardCode := "8qAMMALsnAP4BAP4BAPIBAAAuir4AAP82JAAMNAAACxkSCEcAVxkNUgEAAAI2FgAEAQABAwkBAAMJB4oBABgEAAG6JwC63m4B"[1:]
+	// testBoardCode := successfullShareCode[1:]
+	testBoardCode := "8qAMMALsnAP4BAP4BAPIBAAAuir4AAP82JAAMNAAACxkSCEcAVxkNUgEAAAI2FgAMAQAABhESAAMRCYIBABQEAAa6JwAVA74BAA=="
 	newShareCode := lib.ShareCodeFromBase64(testBoardCode)
 	log.Printf("Unit at 6x3: %d", newShareCode.BoardUnitIDs[6][3])
 }

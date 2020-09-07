@@ -23,7 +23,7 @@ const (
 type ShareCodeV8 struct {
 	// total sizeof: 424
 
-	// Intentionally not public, as this field shall be a constant 0, padding 4 bytes
+	// Intentionally not public, as this field shall be a constant 0
 	version              uint8
 	UnitItems            [BoardCellNum][BoardCellNum]EquippedItem3Bytes     // 24 bits per unit item    (192 bytes)
 	BoardUnitIDs         [BoardCellNum][BoardCellNum]uint8                  // 8 bits per unit          (64 bytes)
@@ -99,6 +99,10 @@ func (sc *ShareCodeV8) DebugPrintSizes() {
 
 // ShareCodeFromBase64 - Create a new share code from a byte64 string
 func ShareCodeFromBase64(sBase64 string) ShareCodeV8 {
+	if sBase64[0] == '8' {
+		sBase64 = sBase64[1:]
+	}
+
 	decodedShareCode, _ := base64.StdEncoding.DecodeString((sBase64))
 	uncompressed, _ := snappy.Decode(nil, decodedShareCode)
 
@@ -123,10 +127,10 @@ func (packedRanks *PackedUnitRank) UnpackUnitRanks() []uint8 {
 
 	for i := range ranks {
 		for offsetIndex, offset := range []int{0, 1, 2, 4} {
-			var a uint32 = (1 << ((i * 4) + offsetIndex))
-			bit := uint32(*packedRanks) & (1 << ((i * 4) + offsetIndex))
+			var value uint32 = (1 << ((i * 4) + offsetIndex))
+			packedRankAnd := uint32(*packedRanks) & (value)
 
-			if bit == a {
+			if packedRankAnd == value {
 				ranks[i] |= (1 << offset)
 			}
 		}

@@ -1,4 +1,4 @@
-module github.com/ThomasK33/go-sharecodes
+module github.com/ThomasK33/go-underlords
 
 go 1.15
 
