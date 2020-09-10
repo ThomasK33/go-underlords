@@ -17,6 +17,7 @@ func main() {
 
 	code := lib.ShareCodeV8{}
 	// code.DebugPrintSizes()
+	// code.ReflectAlignments()
 
 	code.BoardUnitIDs[0][0] = 46 // Alchemist
 	code.BoardUnitIDs[6][6] = 11 // Antimage
@@ -41,7 +42,7 @@ func main() {
 	log.Println(successfullShareCode)
 
 	// testBoardCode := successfullShareCode[1:]
-	testBoardCode := "8qAMMALsnAP4BAP4BAPIBAAAuir4AAP82JAAMNAAACxkSCEcAVxkNUgEAAAI2FgAMAQAABhESAAMRCYIBABQEAAa6JwAVA74BAA=="
+	testBoardCode := "8qAMAAP4BAK4BAATjJ/5uAEZuAAAgEVM0LgAAAG0AbQAACwAAAP8BDAABCRsI/wAJARcBAQAOAQUBAQAGES0QbUBHOlcBEmoBAAFIACABaBABAyAAEAEpLAIgIAAwAAAGAgEgAAWCAHUR2gB0EQkBAQRjAAVyLBAAAgABBAMGdycAdy4fAK4BAA=="
 	newShareCode := lib.ShareCodeFromBase64(testBoardCode)
 	log.Printf("Unit at 6x3: %d", newShareCode.BoardUnitIDs[6][3])
 }

@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 	"unsafe"
 
@@ -51,6 +53,24 @@ func (sc *ShareCodeV8) ToBase64String() string {
 	return successfullShareCode
 }
 
+// PrintBytesString - Print bytes of share code
+func (sc *ShareCodeV8) PrintBytesString() {
+	const sz = int(unsafe.Sizeof(*sc))
+	var asByteSlice []byte = (*(*[sz]byte)(unsafe.Pointer(sc)))[:]
+
+	fmt.Println()
+	fmt.Printf("% x", asByteSlice)
+	fmt.Println()
+	fmt.Println()
+
+	for _, byteEntry := range asByteSlice {
+		fmt.Print(int(byteEntry))
+		fmt.Print(" ")
+	}
+	fmt.Println()
+	fmt.Println()
+}
+
 // DebugPrintSizes - Debug tool printing byte sizes of each field
 func (sc *ShareCodeV8) DebugPrintSizes() {
 	log.Println()
@@ -94,6 +114,24 @@ func (sc *ShareCodeV8) DebugPrintSizes() {
 	log.Println("---")
 	log.Printf("ShareCodeV8 total size: %d bytes", szTotal)
 	log.Println("---")
+	log.Println()
+}
+
+// ReflectAlignments - Debug function to view memory usage and layout
+func (sc *ShareCodeV8) ReflectAlignments() {
+	// First ask Go to give us some information about the MyData type
+	typ := reflect.TypeOf(*sc)
+	log.Println()
+	log.Printf("Struct is %d bytes long\n", typ.Size())
+	// We can run through the fields in the structure in order
+	n := typ.NumField()
+	for i := 0; i < n; i++ {
+		field := typ.Field(i)
+		log.Printf("%s at offset %v, size=%d, align=%d\n",
+			field.Name, field.Offset, field.Type.Size(),
+			field.Type.Align())
+	}
+
 	log.Println()
 }
 
