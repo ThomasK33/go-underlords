@@ -1,4 +1,4 @@
-package lib
+package sharecode
 
 import (
 	"bytes"
@@ -21,32 +21,33 @@ const (
 	SharecodeMaxUnequippedItems = 10
 )
 
-// ShareCodeV8 - The actual share code structure
-type ShareCodeV8 struct {
+// V8 - The actual share code structure
+type V8 struct {
 	// total sizeof: 424
 
 	// Intentionally not public, as this field shall be a constant 0
 	version              uint8
-	UnitItems            [BoardCellNum][BoardCellNum]EquippedItem3Bytes     // 24 bits per unit item    (192 bytes)
-	BoardUnitIDs         [BoardCellNum][BoardCellNum]uint8                  // 8 bits per unit          (64 bytes)
-	SelectedTalents      [SharecodeMaxTalents][2]uint8                      // 128 bits per player      (32 bytes)
-	PackedUnitRanks      [BoardCellNum]PackedUnitRank                       // 4 bits per unit rank     (32 bytes)
-	BenchUnitItems       [BoardCellNum]EquippedItem3Bytes                   // 24 bits per unit item    (24 bytes)
-	BenchedUnitIDs       [BoardCellNum]uint8                                // 8 bits per unit          (8 bytes)
-	PackedBenchUnitRanks PackedUnitRank                                     // 4 bits per unit rank     (4 bytes)
-	UnderlordIDs         [2]uint8                                           // 8 bits per player        (2 bytes)
-	UnderlordRanks       [2]uint8                                           // 8 bits per player        (2 bytes)
-	UnequippedItems      [SharecodeMaxUnequippedItems][2]EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
+	UnitItems            [BoardCellNum][BoardCellNum]V8EquippedItem3Bytes     // 24 bits per unit item    (192 bytes)
+	BoardUnitIDs         [BoardCellNum][BoardCellNum]uint8                    // 8 bits per unit          (64 bytes)
+	SelectedTalents      [SharecodeMaxTalents][2]uint8                        // 128 bits per player      (32 bytes)
+	PackedUnitRanks      [BoardCellNum]V8PackedUnitRank                       // 4 bits per unit rank     (32 bytes)
+	BenchUnitItems       [BoardCellNum]V8EquippedItem3Bytes                   // 24 bits per unit item    (24 bytes)
+	BenchedUnitIDs       [BoardCellNum]uint8                                  // 8 bits per unit          (8 bytes)
+	PackedBenchUnitRanks V8PackedUnitRank                                     // 4 bits per unit rank     (4 bytes)
+	UnderlordIDs         [2]uint8                                             // 8 bits per player        (2 bytes)
+	UnderlordRanks       [2]uint8                                             // 8 bits per player        (2 bytes)
+	UnequippedItems      [SharecodeMaxUnequippedItems][2]V8EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
 }
 
 // ToBase64String - Returns base64 encoding of the share code
-func (sc *ShareCodeV8) ToBase64String() string {
+func (sc *V8) ToBase64String() string {
 	const sz = int(unsafe.Sizeof(*sc))
 	var asByteSlice []byte = (*(*[sz]byte)(unsafe.Pointer(sc)))[:]
 
 	compressed := snappy.Encode(nil, asByteSlice)
 	encodedBoardCode := base64.StdEncoding.EncodeToString(compressed)
 
+	// For a v8 sharecode the version number is always going to be 8
 	successfullShareCode := strconv.FormatInt(ShareCodeVersion, 16) + encodedBoardCode
 
 	// Assert correctness by creating new one from string
@@ -54,7 +55,7 @@ func (sc *ShareCodeV8) ToBase64String() string {
 }
 
 // PrintBytesString - Print bytes of share code
-func (sc *ShareCodeV8) PrintBytesString() {
+func (sc *V8) PrintBytesString() {
 	const sz = int(unsafe.Sizeof(*sc))
 	var asByteSlice []byte = (*(*[sz]byte)(unsafe.Pointer(sc)))[:]
 
@@ -72,14 +73,14 @@ func (sc *ShareCodeV8) PrintBytesString() {
 }
 
 // DebugPrintSizes - Debug tool printing byte sizes of each field
-func (sc *ShareCodeV8) DebugPrintSizes() {
+func (sc *V8) DebugPrintSizes() {
 	log.Println()
 	log.Println("---")
 	log.Println("DebugPrintSizes")
 	log.Println("---")
 
-	szShareCodeEquippedItem := int(unsafe.Sizeof(EquippedItem{}))
-	szShareCodeEquippedItem3Bytes := int(unsafe.Sizeof(EquippedItem3Bytes{}))
+	szShareCodeEquippedItem := int(unsafe.Sizeof(V8EquippedItem{}))
+	szShareCodeEquippedItem3Bytes := int(unsafe.Sizeof(V8EquippedItem3Bytes{}))
 	log.Println()
 	log.Println("# Equipped Item")
 	log.Printf("szShareCodeEquippedItem Struct: %d bytes", szShareCodeEquippedItem)
@@ -118,7 +119,7 @@ func (sc *ShareCodeV8) DebugPrintSizes() {
 }
 
 // ReflectAlignments - Debug function to view memory usage and layout
-func (sc *ShareCodeV8) ReflectAlignments() {
+func (sc *V8) ReflectAlignments() {
 	// First ask Go to give us some information about the MyData type
 	typ := reflect.TypeOf(*sc)
 	log.Println()
@@ -135,8 +136,8 @@ func (sc *ShareCodeV8) ReflectAlignments() {
 	log.Println()
 }
 
-// ShareCodeFromBase64 - Create a new share code from a byte64 string
-func ShareCodeFromBase64(sBase64 string) ShareCodeV8 {
+// V8FromBase64 - Create a new v8 share code from a byte64 string
+func V8FromBase64(sBase64 string) V8 {
 	if sBase64[0] == '8' {
 		sBase64 = sBase64[1:]
 	}
@@ -144,7 +145,7 @@ func ShareCodeFromBase64(sBase64 string) ShareCodeV8 {
 	decodedShareCode, _ := base64.StdEncoding.DecodeString((sBase64))
 	uncompressed, _ := snappy.Decode(nil, decodedShareCode)
 
-	newShareCode := ShareCodeV8{}
+	newShareCode := V8{}
 
 	const newSZ = int(unsafe.Sizeof(newShareCode))
 	var newShareCodeByteSlice []byte = (*(*[newSZ]byte)(unsafe.Pointer(&newShareCode)))[:]
@@ -156,11 +157,11 @@ func ShareCodeFromBase64(sBase64 string) ShareCodeV8 {
 	return newShareCode
 }
 
-// PackedUnitRank - Alias for uint32
-type PackedUnitRank uint32
+// V8PackedUnitRank - Alias for uint32
+type V8PackedUnitRank uint32
 
 // UnpackUnitRanks - Unpack packed unit ranks
-func (packedRanks *PackedUnitRank) UnpackUnitRanks() []uint8 {
+func (packedRanks *V8PackedUnitRank) UnpackUnitRanks() []uint8 {
 	var ranks []uint8 = make([]uint8, BoardCellNum)
 
 	for i := range ranks {
@@ -177,9 +178,9 @@ func (packedRanks *PackedUnitRank) UnpackUnitRanks() []uint8 {
 	return ranks
 }
 
-// PackUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
-func PackUnitRanks(ranks []uint8) PackedUnitRank {
-	var packedUnitRank PackedUnitRank = 0
+// V8PackUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
+func V8PackUnitRanks(ranks []uint8) V8PackedUnitRank {
+	var packedUnitRank V8PackedUnitRank = 0
 
 	for i, rank := range ranks {
 		for offsetIndex, offset := range []uint8{1, 2, 4, 8} {
@@ -194,29 +195,29 @@ func PackUnitRanks(ranks []uint8) PackedUnitRank {
 	return packedUnitRank
 }
 
-// EquippedItem - Equipped item struct
-type EquippedItem struct {
+// V8EquippedItem - Equipped item struct
+type V8EquippedItem struct {
 	ItemID uint16
 }
 
-// EquippedItem3Bytes - Equipped items use up 24 bits, yet one bit is unused
-type EquippedItem3Bytes [3]byte
+// V8EquippedItem3Bytes - Equipped items use up 24 bits, yet one bit is unused
+type V8EquippedItem3Bytes [3]byte
 
 // ToEquippedItem - Convert back 3 bytes array to EquippedItem struct
-func (item *EquippedItem3Bytes) ToEquippedItem() EquippedItem {
+func (item *V8EquippedItem3Bytes) ToEquippedItem() V8EquippedItem {
 	var now []byte = item[:2]
 	nowBuffer := bytes.NewReader(now)
 	var itemDefIndex uint16
 	binary.Read(nowBuffer, binary.LittleEndian, &itemDefIndex)
 
-	return EquippedItem{
+	return V8EquippedItem{
 		ItemID: itemDefIndex,
 	}
 }
 
-// NewEquippedItem3Bytes - Go hack to create a 3 bytes big struct from a ShareCodeEquippedItem
-func NewEquippedItem3Bytes(item EquippedItem) EquippedItem3Bytes {
+// V8NewEquippedItem3Bytes - Go hack to create a 3 bytes big struct from a ShareCodeEquippedItem
+func V8NewEquippedItem3Bytes(item V8EquippedItem) V8EquippedItem3Bytes {
 	i := item.ItemID
 	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
-	return EquippedItem3Bytes{l, h, 00}
+	return V8EquippedItem3Bytes{l, h, 00}
 }
