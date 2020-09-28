@@ -39,6 +39,11 @@ type V8 struct {
 	UnequippedItems      [SharecodeMaxUnequippedItems][2]V8EquippedItem3Bytes // 24 bits per unused item  (60 bytes)
 }
 
+// ToString - Alias for ToBase64String
+func (sc *V8) ToString() string {
+	return sc.ToBase64String()
+}
+
 // ToBase64String - Returns base64 encoding of the share code
 func (sc *V8) ToBase64String() string {
 	const sz = int(unsafe.Sizeof(*sc))
@@ -215,7 +220,7 @@ func (item *V8EquippedItem3Bytes) ToEquippedItem() V8EquippedItem {
 	}
 }
 
-// V8NewEquippedItem3Bytes - Go hack to create a 3 bytes big struct from a ShareCodeEquippedItem
+// V8NewEquippedItem3Bytes - Creates a 3 bytes big struct from a ShareCodeEquippedItem
 func V8NewEquippedItem3Bytes(item V8EquippedItem) V8EquippedItem3Bytes {
 	i := item.ItemID
 	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
