@@ -141,13 +141,13 @@ func (sc *V8) ReflectAlignments() {
 	log.Println()
 }
 
-// V8FromBase64 - Create a new v8 share code from a byte64 string
-func V8FromBase64(sBase64 string) V8 {
-	if sBase64[0] == '8' {
-		sBase64 = sBase64[1:]
+// NewV8FromCode - Create a new v8 share code from a byte64 string
+func NewV8FromCode(sharecode string) V8 {
+	if sharecode[0] == '8' {
+		sharecode = sharecode[1:]
 	}
 
-	decodedShareCode, _ := base64.StdEncoding.DecodeString((sBase64))
+	decodedShareCode, _ := base64.StdEncoding.DecodeString((sharecode))
 	uncompressed, _ := snappy.Decode(nil, decodedShareCode)
 
 	newShareCode := V8{}
@@ -183,8 +183,8 @@ func (packedRanks *V8PackedUnitRank) UnpackUnitRanks() []uint8 {
 	return ranks
 }
 
-// V8PackUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
-func V8PackUnitRanks(ranks []uint8) V8PackedUnitRank {
+// NewV8PackedUnitRanks - Function to pack uint8 array into a uint32, removing the first 4 bits of each uint8
+func NewV8PackedUnitRanks(ranks []uint8) V8PackedUnitRank {
 	var packedUnitRank V8PackedUnitRank = 0
 
 	for i, rank := range ranks {
@@ -220,8 +220,8 @@ func (item *V8EquippedItem3Bytes) ToEquippedItem() V8EquippedItem {
 	}
 }
 
-// V8NewEquippedItem3Bytes - Creates a 3 bytes big struct from a ShareCodeEquippedItem
-func V8NewEquippedItem3Bytes(item V8EquippedItem) V8EquippedItem3Bytes {
+// NewV8EquippedItem3Bytes - Creates a 3 bytes big struct from a ShareCodeEquippedItem
+func NewV8EquippedItem3Bytes(item V8EquippedItem) V8EquippedItem3Bytes {
 	i := item.ItemID
 	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
 	return V8EquippedItem3Bytes{l, h, 00}

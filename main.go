@@ -27,23 +27,23 @@ func main() {
 	code.UnderlordIDs[1] = 4      // Hobgen
 	code.UnderlordRanks[1] = 4    // Underlords rank
 
-	code.UnitItems[0][0] = sharecode.V8NewEquippedItem3Bytes(sharecode.V8EquippedItem{
+	code.UnitItems[0][0] = sharecode.NewV8EquippedItem3Bytes(sharecode.V8EquippedItem{
 		ItemID: 10171,
 	})
 
-	code.UnequippedItems[0][0] = sharecode.V8NewEquippedItem3Bytes(sharecode.V8EquippedItem{
+	code.UnequippedItems[0][0] = sharecode.NewV8EquippedItem3Bytes(sharecode.V8EquippedItem{
 		ItemID: 10170,
 	})
 
-	code.PackedUnitRanks[0] = sharecode.V8PackUnitRanks([]uint8{2})
-	code.PackedUnitRanks[6] = sharecode.V8PackUnitRanks([]uint8{0, 0, 0, 0, 0, 0, 3, 0})
+	code.PackedUnitRanks[0] = sharecode.NewV8PackedUnitRanks([]uint8{2})
+	code.PackedUnitRanks[6] = sharecode.NewV8PackedUnitRanks([]uint8{0, 0, 0, 0, 0, 0, 3, 0})
 
 	successfullShareCode := code.ToBase64String()
 	log.Println(successfullShareCode)
 
 	// testBoardCode := successfullShareCode
-	testBoardCode := "8qAMAAP4BAK4BAATjJ/5uAEZuAAAgEVM0LgAAAG0AbQAACwAAAP8BDAABCRsI/wAJARcBAQAOAQUBAQAGES0QbUBHOlcBEmoBAAFIACABaBABAyAAEAEpLAIgIAAwAAAGAgEgAAWCAHUR2gB0EQkBAQRjAAVyLBAAAgABBAMGdycAdy4fAK4BAA=="
-	newShareCode := sharecode.V8FromBase64(testBoardCode)
+	testShareCode := "8qAMAAP4BAK4BAATjJ/5uAEZuAAAgEVM0LgAAAG0AbQAACwAAAP8BDAABCRsI/wAJARcBAQAOAQUBAQAGES0QbUBHOlcBEmoBAAFIACABaBABAyAAEAEpLAIgIAAwAAAGAgEgAAWCAHUR2gB0EQkBAQRjAAVyLBAAAgABBAMGdycAdy4fAK4BAA=="
+	newShareCode := sharecode.NewV8FromCode(testShareCode)
 	log.Print(newShareCode.BoardUnitIDs)
 	log.Printf("Unit at 6x3: %d", newShareCode.BoardUnitIDs[6][6])
 }
