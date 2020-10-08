@@ -6,18 +6,8 @@ import (
 	"github.com/ThomasK33/go-underlords/sharecode"
 )
 
-// Runtime version and build number
-var (
-	Version string
-	Build   string
-)
-
 func main() {
-	log.Println("Starting " + Version + " (" + Build + ")")
-
 	code := sharecode.V8{}
-	// code.DebugPrintSizes()
-	// code.ReflectAlignments()
 
 	code.BoardUnitIDs[0][0] = 46 // Alchemist
 	code.BoardUnitIDs[6][6] = 11 // Antimage
@@ -41,9 +31,8 @@ func main() {
 	successfullShareCode := code.ToBase64String()
 	log.Println(successfullShareCode)
 
-	// testBoardCode := successfullShareCode
 	testShareCode := "8qAMAAP4BAK4BAATjJ/5uAEZuAAAgEVM0LgAAAG0AbQAACwAAAP8BDAABCRsI/wAJARcBAQAOAQUBAQAGES0QbUBHOlcBEmoBAAFIACABaBABAyAAEAEpLAIgIAAwAAAGAgEgAAWCAHUR2gB0EQkBAQRjAAVyLBAAAgABBAMGdycAdy4fAK4BAA=="
 	newShareCode := sharecode.NewV8FromCode(testShareCode)
 	log.Print(newShareCode.BoardUnitIDs)
-	log.Printf("Unit at 6x3: %d", newShareCode.BoardUnitIDs[6][6])
+	log.Printf("Unit at 6x6: %d", newShareCode.BoardUnitIDs[6][6])
 }

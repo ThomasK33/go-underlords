@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
-	"fmt"
 	"log"
 	"reflect"
 	"strconv"
@@ -64,17 +63,17 @@ func (sc *V8) PrintBytesString() {
 	const sz = int(unsafe.Sizeof(*sc))
 	var asByteSlice []byte = (*(*[sz]byte)(unsafe.Pointer(sc)))[:]
 
-	fmt.Println()
-	fmt.Printf("% x", asByteSlice)
-	fmt.Println()
-	fmt.Println()
+	log.Println()
+	log.Printf("% x", asByteSlice)
+	log.Println()
+	log.Println()
 
 	for _, byteEntry := range asByteSlice {
-		fmt.Print(int(byteEntry))
-		fmt.Print(" ")
+		log.Print(int(byteEntry))
+		log.Print(" ")
 	}
-	fmt.Println()
-	fmt.Println()
+	log.Println()
+	log.Println()
 }
 
 // DebugPrintSizes - Debug tool printing byte sizes of each field
@@ -205,7 +204,7 @@ type V8EquippedItem struct {
 	ItemID uint16
 }
 
-// V8EquippedItem3Bytes - Equipped items use up 24 bits, yet one bit is unused
+// V8EquippedItem3Bytes - Equipped items use up 24 bits, yet one byte is unused
 type V8EquippedItem3Bytes [3]byte
 
 // ToEquippedItem - Convert back 3 bytes array to EquippedItem struct

@@ -1,14 +1,15 @@
 -include .env
 
-VERSION := $(shell git describe --tags)
-BUILD := $(shell git rev-parse --short HEAD)
+# VERSION := $(shell git describe --tags 2> /dev/null || echo v0.0.0)
+# BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
 
 # Go related variables.
 GOFILES := $(wildcard *.go)
 
 # Use linker flags to provide version/build settings
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+# LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+LDFLAGS=
 
 # Redirect error output to a file, so we can show it in development mode.
 STDERR := /tmp/.$(PROJECTNAME)-stderr.txt
@@ -22,6 +23,10 @@ install: go-get
 ## run: Run the application
 run:
 	@-$(MAKE) go-run
+
+## test: Run unit tests
+test:
+	@-$(MAKE) go-test
 
 ## compile: Compile the binary.
 compile:
@@ -54,6 +59,9 @@ go-install:
 
 go-run:
 	go run $(LDFLAGS) $(GOFILES)
+
+go-test:
+	go test $(LDFLAGS) -race -covermode=atomic -coverprofile=coverage.out -v ./... 
 
 go-clean:
 	@echo "  >  Cleaning build cache"
