@@ -1,4 +1,4 @@
-# Underlords Share Codes
+# Go-Underlords
 
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/ThomasK33/go-underlords)](https://github.com/ThomasK33/go-underlords/blob/master/go.mod)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ThomasK33/go-underlords)](https://goreportcard.com/report/github.com/ThomasK33/go-underlords)
