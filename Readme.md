@@ -2,6 +2,7 @@
 
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/ThomasK33/go-underlords)](https://github.com/ThomasK33/go-underlords/blob/master/go.mod)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ThomasK33/go-underlords)](https://goreportcard.com/report/github.com/ThomasK33/go-underlords)
+[![PkgGoDev](https://pkg.go.dev/badge/ThomasK33/go-underlords)](https://pkg.go.dev/ThomasK33/go-underlords)
 [![Go CI](https://github.com/ThomasK33/go-underlords/workflows/Go%20CI/badge.svg)](https://github.com/ThomasK33/go-underlords/actions?query=workflow%3A%22Go+CI%22)
 [![Coverage Status](https://coveralls.io/repos/github/ThomasK33/go-underlords/badge.svg?branch=master)](https://coveralls.io/github/ThomasK33/go-underlords?branch=master)
 
