@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/ThomasK33/go-underlords/sharecode"
+	"github.com/ThomasK33/go-underlords/pkg/sharecode"
 )
 
 func main() {

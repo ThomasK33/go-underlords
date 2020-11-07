@@ -5,7 +5,8 @@
 PROJECTNAME := $(shell basename "$(PWD)")
 
 # Go related variables.
-GOFILES := $(wildcard *.go)
+# GOFILES := $(wildcard *.go)
+GOFILES=examples/main.go
 
 # Use linker flags to provide version/build settings
 # LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
@@ -33,7 +34,7 @@ compile:
 	@-touch $(STDERR)
 	@-rm $(STDERR)
 	@-$(MAKE) -s go-compile 2> $(STDERR)
-	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
+	@cat $(STDERR) 1>&2
 
 ## clean: Clean build files. Runs `go clean` internally.
 clean:
@@ -52,7 +53,7 @@ go-generate:
 
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
-	go get $(get)
+	go get $(get) -v all
 
 go-install:
 	go install $(GOFILES)
