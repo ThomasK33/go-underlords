@@ -154,9 +154,7 @@ func NewV8FromCode(sharecode string) V8 {
 	const newSZ = int(unsafe.Sizeof(newShareCode))
 	var newShareCodeByteSlice []byte = (*(*[newSZ]byte)(unsafe.Pointer(&newShareCode)))[:]
 
-	for i, value := range uncompressed {
-		newShareCodeByteSlice[i] = value
-	}
+	copy(newShareCodeByteSlice, uncompressed)
 
 	return newShareCode
 }
@@ -208,15 +206,19 @@ type V8EquippedItem struct {
 type V8EquippedItem3Bytes [3]byte
 
 // ToEquippedItem - Convert back 3 bytes array to EquippedItem struct
-func (item *V8EquippedItem3Bytes) ToEquippedItem() V8EquippedItem {
+func (item *V8EquippedItem3Bytes) ToEquippedItem() (V8EquippedItem, error) {
 	var now []byte = item[:2]
 	nowBuffer := bytes.NewReader(now)
 	var itemDefIndex uint16
-	binary.Read(nowBuffer, binary.LittleEndian, &itemDefIndex)
+	err := binary.Read(nowBuffer, binary.LittleEndian, &itemDefIndex)
+
+	if err != nil {
+		return V8EquippedItem{}, err
+	}
 
 	return V8EquippedItem{
 		ItemID: itemDefIndex,
-	}
+	}, nil
 }
 
 // NewV8EquippedItem3Bytes - Creates a 3 bytes big struct from a ShareCodeEquippedItem

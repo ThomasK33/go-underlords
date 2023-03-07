@@ -110,7 +110,11 @@ func TestToEquippedItem(t *testing.T) {
 	}
 
 	for _, item := range itemTable {
-		equippedItemID := item.bytes.ToEquippedItem().ItemID
+		equippedItem, err := item.bytes.ToEquippedItem()
+		if err != nil {
+			t.Errorf("Error converting bytes to equipped item: %s", err)
+		}
+		equippedItemID := equippedItem.ItemID
 
 		if equippedItemID != item.itemID {
 			t.Errorf("Incorrectly deserialized item id. Got %d instead of %d", equippedItemID, item.itemID)

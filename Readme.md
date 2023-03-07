@@ -63,10 +63,10 @@ func main() {
   code.PackedUnitRanks[6] = sharecode.NewV8PackedUnitRanks([]uint8{0, 0, 0, 0, 0, 0, 3, 0})
 
   // code.ToString() is equivalent to code.ToBase64String()
-  successfullShareCode := code.ToBase64String()
-  log.Println(successfullShareCode)
+  successfulShareCode := code.ToBase64String()
+  log.Println(successfulShareCode)
 
-  // Instanciate a v8 share code from a base64 string
+  // Instantiate a v8 share code from a base64 string
   testShareCode := "8qAMAAP4BAK4BAATjJ/5uAEZuAAAgEVM0LgAAAG0AbQAACwAAAP8BDAABCRsI/wAJARcBAQAOAQUBAQAGES0QbUBHOlcBEmoBAAFIACABaBABAyAAEAEpLAIgIAAwAAAGAgEgAAWCAHUR2gB0EQkBAQRjAAVyLBAAAgABBAMGdycAdy4fAK4BAA=="
   newShareCode := sharecode.NewV8FromCode(testShareCode)
   log.Print(newShareCode.BoardUnitIDs)
