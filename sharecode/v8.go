@@ -199,7 +199,10 @@ func NewV8PackedUnitRanks(ranks []uint8) V8PackedUnitRank {
 
 // V8EquippedItem - Equipped item struct
 type V8EquippedItem struct {
-	ItemID uint16
+	ItemID          uint16
+	HasOffensiveGem bool
+	HasDefensiveGem bool
+	HasSupportGem   bool
 }
 
 // V8EquippedItem3Bytes - Equipped items use up 24 bits, yet one byte is unused
@@ -216,8 +219,14 @@ func (item *V8EquippedItem3Bytes) ToEquippedItem() (V8EquippedItem, error) {
 		return V8EquippedItem{}, err
 	}
 
+	// Extract gem flags from the 3rd byte (bits 0, 1, 2)
+	gemByte := item[2]
+
 	return V8EquippedItem{
-		ItemID: itemDefIndex,
+		ItemID:          itemDefIndex,
+		HasOffensiveGem: (gemByte & 0x01) != 0,
+		HasDefensiveGem: (gemByte & 0x02) != 0,
+		HasSupportGem:   (gemByte & 0x04) != 0,
 	}, nil
 }
 
@@ -225,5 +234,18 @@ func (item *V8EquippedItem3Bytes) ToEquippedItem() (V8EquippedItem, error) {
 func NewV8EquippedItem3Bytes(item V8EquippedItem) V8EquippedItem3Bytes {
 	i := item.ItemID
 	var h, l uint8 = uint8(i >> 8), uint8(i & 0xff)
-	return V8EquippedItem3Bytes{l, h, 00}
+
+	// Encode gem flags into the 3rd byte (bits 0, 1, 2)
+	var gemByte uint8 = 0
+	if item.HasOffensiveGem {
+		gemByte |= 0x01
+	}
+	if item.HasDefensiveGem {
+		gemByte |= 0x02
+	}
+	if item.HasSupportGem {
+		gemByte |= 0x04
+	}
+
+	return V8EquippedItem3Bytes{l, h, gemByte}
 }

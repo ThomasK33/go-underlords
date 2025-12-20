@@ -82,31 +82,43 @@ func TestNewV8PackedUnitRanks(t *testing.T) {
 
 func TestNewV8EquippedItem3Bytes(t *testing.T) {
 	itemTable := []struct {
-		itemID uint16
-		bytes  [3]byte
+		item  V8EquippedItem
+		bytes [3]byte
 	}{
-		{itemID: 10170, bytes: [3]byte{186, 39, 0}},
-		{itemID: 10171, bytes: [3]byte{187, 39, 0}},
-		{itemID: 10201, bytes: [3]byte{217, 39, 0}},
+		{item: V8EquippedItem{ItemID: 10170}, bytes: [3]byte{186, 39, 0}},
+		{item: V8EquippedItem{ItemID: 10171}, bytes: [3]byte{187, 39, 0}},
+		{item: V8EquippedItem{ItemID: 10201}, bytes: [3]byte{217, 39, 0}},
+		// Test gem flags
+		{item: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true}, bytes: [3]byte{186, 39, 0x01}},
+		{item: V8EquippedItem{ItemID: 10170, HasDefensiveGem: true}, bytes: [3]byte{186, 39, 0x02}},
+		{item: V8EquippedItem{ItemID: 10170, HasSupportGem: true}, bytes: [3]byte{186, 39, 0x04}},
+		{item: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true, HasDefensiveGem: true}, bytes: [3]byte{186, 39, 0x03}},
+		{item: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true, HasDefensiveGem: true, HasSupportGem: true}, bytes: [3]byte{186, 39, 0x07}},
 	}
 
 	for _, item := range itemTable {
-		equippedItem3Bytes := NewV8EquippedItem3Bytes(V8EquippedItem{ItemID: item.itemID})
+		equippedItem3Bytes := NewV8EquippedItem3Bytes(item.item)
 
 		if !bytes.Equal(equippedItem3Bytes[:], item.bytes[:]) {
-			t.Errorf("Equipped item bytes incorrectly encoded")
+			t.Errorf("Equipped item bytes incorrectly encoded: got %v, expected %v", equippedItem3Bytes, item.bytes)
 		}
 	}
 }
 
 func TestToEquippedItem(t *testing.T) {
 	itemTable := []struct {
-		itemID uint16
-		bytes  V8EquippedItem3Bytes
+		expected V8EquippedItem
+		bytes    V8EquippedItem3Bytes
 	}{
-		{itemID: 10170, bytes: [3]byte{186, 39, 0}},
-		{itemID: 10171, bytes: [3]byte{187, 39, 0}},
-		{itemID: 10201, bytes: [3]byte{217, 39, 0}},
+		{expected: V8EquippedItem{ItemID: 10170}, bytes: [3]byte{186, 39, 0}},
+		{expected: V8EquippedItem{ItemID: 10171}, bytes: [3]byte{187, 39, 0}},
+		{expected: V8EquippedItem{ItemID: 10201}, bytes: [3]byte{217, 39, 0}},
+		// Test gem flags
+		{expected: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true}, bytes: [3]byte{186, 39, 0x01}},
+		{expected: V8EquippedItem{ItemID: 10170, HasDefensiveGem: true}, bytes: [3]byte{186, 39, 0x02}},
+		{expected: V8EquippedItem{ItemID: 10170, HasSupportGem: true}, bytes: [3]byte{186, 39, 0x04}},
+		{expected: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true, HasDefensiveGem: true}, bytes: [3]byte{186, 39, 0x03}},
+		{expected: V8EquippedItem{ItemID: 10170, HasOffensiveGem: true, HasDefensiveGem: true, HasSupportGem: true}, bytes: [3]byte{186, 39, 0x07}},
 	}
 
 	for _, item := range itemTable {
@@ -114,10 +126,18 @@ func TestToEquippedItem(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error converting bytes to equipped item: %s", err)
 		}
-		equippedItemID := equippedItem.ItemID
 
-		if equippedItemID != item.itemID {
-			t.Errorf("Incorrectly deserialized item id. Got %d instead of %d", equippedItemID, item.itemID)
+		if equippedItem.ItemID != item.expected.ItemID {
+			t.Errorf("Incorrectly deserialized item id. Got %d instead of %d", equippedItem.ItemID, item.expected.ItemID)
+		}
+		if equippedItem.HasOffensiveGem != item.expected.HasOffensiveGem {
+			t.Errorf("Incorrectly deserialized HasOffensiveGem. Got %v instead of %v", equippedItem.HasOffensiveGem, item.expected.HasOffensiveGem)
+		}
+		if equippedItem.HasDefensiveGem != item.expected.HasDefensiveGem {
+			t.Errorf("Incorrectly deserialized HasDefensiveGem. Got %v instead of %v", equippedItem.HasDefensiveGem, item.expected.HasDefensiveGem)
+		}
+		if equippedItem.HasSupportGem != item.expected.HasSupportGem {
+			t.Errorf("Incorrectly deserialized HasSupportGem. Got %v instead of %v", equippedItem.HasSupportGem, item.expected.HasSupportGem)
 		}
 	}
 }
